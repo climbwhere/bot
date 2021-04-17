@@ -33,23 +33,43 @@ export const getGyms = async () => {
 export const querySlots = async ({ gym, date = moment() }) => {
   const slots = await getSlots();
   return formatSlots(
-    slots.data.filter(
-      (slot) => slot.gym === gym && moment(slot.start).diff(date, "days") < 1
-    ),
-    gym
+    slots.data.filter((slot) => slot.gym === gym),
+    gym,
+    slots.last_updated
   );
 };
 
-const formatSlots = (slots, gym) => {
-  return `Here are the slots for *${gym.replace(
-    /[-[\]{}()*+?.,\\^$|#\s]/g,
-    "\\$&"
-  )}* for the next 24 hours:\n${sortBy(slots, "start")
+const escapeString = (string) =>
+  string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+
+const formatSlots = (slots, gym, lastUpdated) => {
+  const groupedSlots = groupBy(
+    slots.map((slot) => ({
+      ...slot,
+      date: moment(slot.start).format("dddd, DD MMM"),
+    })),
+    "date"
+  );
+  return `Here are the slots for *${escapeString(gym)}*:\n\n${sortBy(
+    keys(groupedSlots),
+    [
+      function (o) {
+        return moment(o, "dddd, DD MMM");
+      },
+    ]
+  )
     .map(
-      (slot) =>
-        `\`${moment(slot.start).format("ddd DD-MMM hh:mmA")} to ${moment(
-          slot.end
-        ).format("hh:mmA")}:  ${slot.spaces}\``
+      (date) =>
+        `*${date}*\n${escapeString(
+          sortBy(groupedSlots[date], "start")
+            .map(
+              (slot) =>
+                `${slot.spaces > 0 ? "✅" : "❌"} \`${moment(slot.start).format(
+                  "hh:mmA"
+                )}: ${slot.spaces}\``
+            )
+            .join("\n")
+        )}`
     )
-    .join("\n")}`;
+    .join("\n\n")}\n\nLast updated ${moment(lastUpdated).fromNow()}`;
 };
