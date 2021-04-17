@@ -21,7 +21,6 @@ export default function useBot({ token, botURL }) {
 
   bot.onText(/\/slots/, async ({ message_id, from, chat, date, text }) => {
     const gyms = await getGyms();
-
     bot.sendMessage(
       chat.id,
       `${
@@ -39,6 +38,13 @@ export default function useBot({ token, botURL }) {
           ),
         },
       }
+    );
+  });
+
+  bot.onText(/\/moreinfo/, async ({ message_id, from, chat, date, text }) => {
+    bot.sendMessage(
+      chat.id,
+      "Check out our website at https://climbwhere.sg for more information and better filtering options!"
     );
   });
 
