@@ -39,7 +39,7 @@ export const querySlots = async ({ gym, date = moment() }) => {
   );
 };
 
-const escapeString = (string) =>
+export const escapeString = (string) =>
   string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
 const formatSlots = (slots, gym, lastUpdated) => {
