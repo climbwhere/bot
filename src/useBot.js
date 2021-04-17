@@ -9,13 +9,14 @@ export default function useBot({ token, botURL }) {
 
   bot.setWebHook(`${botURL}/bot${token}`);
 
-  //  message_id, from, chat, date, text
   bot.onText(/\/start/, async ({ message_id, from, chat, date, text }) => {
     bot.sendMessage(
       chat.id,
       `Hello there, ${from.first_name}! Welcome to the Climbwhere Telegram bot!`
     );
+  });
 
+  bot.onText(/\/slots/, async ({ message_id, from, chat, date, text }) => {
     const gyms = await getGyms();
 
     bot.sendMessage(chat.id, "To begin, select which gym you want to check:", {
@@ -30,14 +31,14 @@ export default function useBot({ token, botURL }) {
         ),
       },
     });
+  });
 
-    bot.on("callback_query", async ({ id, from, data }) => {
-      const queryParams = queryString.parse(data);
-      const results = await querySlots(queryParams);
-      bot.answerCallbackQuery(id, "Done");
-      bot.sendMessage(from.id, results, {
-        parse_mode: "MarkdownV2",
-      });
+  bot.on("callback_query", async ({ id, from, data }) => {
+    const queryParams = queryString.parse(data);
+    const results = await querySlots(queryParams);
+    bot.answerCallbackQuery(id, "Done");
+    bot.sendMessage(from.id, results, {
+      parse_mode: "MarkdownV2",
     });
   });
 
