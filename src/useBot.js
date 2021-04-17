@@ -34,9 +34,10 @@ export default function useBot({ token, botURL }) {
     bot.on("callback_query", async ({ id, from, data }) => {
       const queryParams = queryString.parse(data);
       const results = await querySlots(queryParams);
-      console.log(results.length);
       bot.answerCallbackQuery(id, "Done");
-      bot.sendMessage(from.id, results);
+      bot.sendMessage(from.id, results, {
+        parse_mode: "MarkdownV2",
+      });
     });
   });
 

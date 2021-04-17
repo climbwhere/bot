@@ -2,6 +2,7 @@ import axios from "axios";
 import moment from "moment";
 import groupBy from "lodash/groupBy";
 import keys from "lodash/keys";
+import sortBy from "lodash/sortBy";
 
 let slotCacheDate;
 let slotCache;
@@ -33,25 +34,22 @@ export const querySlots = async ({ gym, date = moment() }) => {
   const slots = await getSlots();
   return formatSlots(
     slots.data.filter(
-      (slot) => slot.gym === gym && date.diff(moment(slot.start), "days") <= 1
-    )
+      (slot) => slot.gym === gym && moment(slot.start).diff(date, "days") < 1
+    ),
+    gym
   );
 };
 
-const formatSlots = (slots) =>
-  slots
+const formatSlots = (slots, gym) => {
+  return `Here are the slots for *${gym.replace(
+    /[-[\]{}()*+?.,\\^$|#\s]/g,
+    "\\$&"
+  )}* for the next 24 hours:\n${sortBy(slots, "start")
     .map(
       (slot) =>
-        `${slot.gym} ${moment(slot.start).toDate().toLocaleString("en-SG", {
-          hour: "numeric",
-          hour12: true,
-          minute: "numeric",
-          minute12: true,
-        })} - ${moment(slot.end).toDate().toLocaleString("en-SG", {
-          hour: "numeric",
-          hour12: true,
-          minute: "numeric",
-          minute12: true,
-        })} ${slot.spaces} spaces`
+        `\`${moment(slot.start).format("ddd DD-MMM hh:mmA")} to ${moment(
+          slot.end
+        ).format("hh:mmA")}:  ${slot.spaces}\``
     )
-    .join("\n");
+    .join("\n")}`;
+};
