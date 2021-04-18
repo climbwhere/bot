@@ -23,7 +23,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
-    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "node-telegram-bot-api": "^0.52.0",
     "query-string": "^7.0.0"
   },

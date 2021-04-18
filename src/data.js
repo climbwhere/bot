@@ -1,5 +1,5 @@
 import axios from "axios";
-import moment from "moment";
+import moment from "moment-timezone";
 import groupBy from "lodash/groupBy";
 import keys from "lodash/keys";
 import sortBy from "lodash/sortBy";

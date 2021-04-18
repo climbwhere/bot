@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 import express from "express";
 import useBot from "./useBot";
+import moment from "moment-timezone";
+
+moment.tz.setDefault("Asia/Singapore");
 
 dotenv.config();
 
