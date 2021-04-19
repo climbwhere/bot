@@ -2,14 +2,18 @@ import TelegramBot from "node-telegram-bot-api";
 import chunk from "lodash/chunk";
 import queryString from "query-string";
 
-import { escapeString, getGyms, querySlots } from "./data";
+import { getGyms, querySlots } from "./data";
 
-export default function useBot({ token, botURL }) {
+export default function useBot({ token, botURL, mixpanel }) {
   const bot = new TelegramBot(token, { polling: true });
 
   bot.setWebHook(`${botURL}/bot${token}`);
 
   bot.onText(/\/start/, async ({ message_id, from, chat, date, text }) => {
+    mixpanel.track("New user", {
+      distinct_id: chat.id,
+    });
+
     bot.sendMessage(
       chat.id,
       "🧗 *Climbwhere SG*\nHello\\! To check the slots at your favourite local gyms, use */slots*",
@@ -20,6 +24,9 @@ export default function useBot({ token, botURL }) {
   });
 
   bot.onText(/\/slots/, async ({ message_id, from, chat, date, text }) => {
+    mixpanel.track("Check slots", {
+      distinct_id: chat.id,
+    });
     const gyms = await getGyms();
     bot.sendMessage(
       chat.id,
@@ -42,6 +49,7 @@ export default function useBot({ token, botURL }) {
   });
 
   bot.onText(/\/moreinfo/, async ({ message_id, from, chat, date, text }) => {
+    mixpanel.track("More info", { distinct_id: chat.id });
     bot.sendMessage(
       chat.id,
       "Check out our website at https://climbwhere.sg for more information and better filtering options!"

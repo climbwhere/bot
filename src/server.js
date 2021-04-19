@@ -1,15 +1,28 @@
 import dotenv from "dotenv";
 import express from "express";
-import useBot from "./useBot";
 import moment from "moment-timezone";
+import Mixpanel from "mixpanel";
+
+import useBot from "./useBot";
 
 moment.tz.setDefault("Asia/Singapore");
 
 dotenv.config();
 
-const { PORT, TELEGRAM_BOT_TOKEN, BOT_SERVER_URL } = process.env;
+const {
+  PORT,
+  TELEGRAM_BOT_TOKEN,
+  BOT_SERVER_URL,
+  MIXPANEL_TOKEN,
+} = process.env;
 
-const bot = useBot({ token: TELEGRAM_BOT_TOKEN, botURL: BOT_SERVER_URL });
+const mixpanel = Mixpanel.init(MIXPANEL_TOKEN);
+
+const bot = useBot({
+  token: TELEGRAM_BOT_TOKEN,
+  botURL: BOT_SERVER_URL,
+  mixpanel,
+});
 
 const app = express();
 
