@@ -16,7 +16,7 @@ export default function useBot({ token, botURL, mixpanel }) {
 
     bot.sendMessage(
       chat.id,
-      "🧗 *Climbwhere SG*\nHello\\! To check the slots at your favourite local gyms, use */slots*",
+      "🧗 *Climbwhere SG*\nHello\\! To check out the slots at your favourite local gyms, use */slots*",
       {
         parse_mode: "MarkdownV2",
       }
@@ -28,11 +28,10 @@ export default function useBot({ token, botURL, mixpanel }) {
       distinct_id: chat.id,
     });
     const gyms = await getGyms();
+    const wordsOfAffirmation = ["Sure thing,", "Okay!", "Yep okay,"][Math.floor(3 * Math.random())];
     bot.sendMessage(
       chat.id,
-      `${
-        ["Sure thing,", "Okay!", "Yep okay,"][Math.floor(3 * Math.random())]
-      } which gym you want to check?`,
+      `${wordsOfAffirmation} which gym you want to check?`,
       {
         reply_markup: {
           one_time_keyboard: true,
