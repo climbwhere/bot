@@ -3,54 +3,53 @@ import moment from "moment-timezone";
 import groupBy from "lodash/groupBy";
 import keys from "lodash/keys";
 import sortBy from "lodash/sortBy";
+import dotenv from "dotenv";
 
-let slotCacheDate;
-let slotCache;
+dotenv.config();
+
+const API_URL = process.env.API_URL;
 
 const getSlots = async () => {
-  if (slotCache !== undefined) {
-    const cacheAge = moment().diff(slotCacheDate, "minutes");
-    if (cacheAge < 2) {
-      return slotCache;
-    }
-  }
   const slotData = await axios
-    .get(
-      "https://triomic.github.io/climbing-gym-scraper/sessions.json?rnd=" +
-        Math.random()
-    )
-    .then(({ data }) => data);
-  slotCache = { ...slotData };
-  slotCacheDate = moment();
+    .get(API_URL + "/sessions")
+    .then(({ data }) => data.data);
   return slotData;
 };
 
-export const getGyms = async () => {
-  const slots = await getSlots();
-  return keys(groupBy(slots.data, "gym"));
+const getLastUpdated = async () => {
+  const lastUpdated = await axios
+    .get(API_URL + "/snapshots/latest")
+    .then(({ data }) => data.data.created_at);
+  return lastUpdated;
 };
 
-export const querySlots = async ({ gym, date = moment() }) => {
+export const getGyms = async () => {
+  const gyms = await axios.get(API_URL + "/gyms").then(({ data }) => data.data);
+  return gyms;
+};
+
+export const querySlots = async ({ gymSlug, gymName, date = moment() }) => {
   const slots = await getSlots();
+  const lastUpdated = await getLastUpdated();
   return formatSlots(
-    slots.data.filter((slot) => slot.gym === gym),
-    gym,
-    slots.last_updated
+    slots.filter((slot) => slot.gym.slug === gymSlug),
+    gymName,
+    lastUpdated
   );
 };
 
 export const escapeString = (string) =>
   string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
-const formatSlots = (slots, gym, lastUpdated) => {
+const formatSlots = (slots, gymName, lastUpdated) => {
   const groupedSlots = groupBy(
     slots.map((slot) => ({
       ...slot,
-      date: moment(slot.start).format("dddd, DD MMM"),
+      date: moment(slot.starts_at).format("dddd, DD MMM"),
     })),
     "date"
   );
-  return `Here are the slots for *${escapeString(gym)}*:\n\n${sortBy(
+  return `Here are the slots for *${escapeString(gymName)}*:\n\n${sortBy(
     keys(groupedSlots),
     [
       function (o) {
@@ -61,12 +60,12 @@ const formatSlots = (slots, gym, lastUpdated) => {
     .map(
       (date) =>
         `*${date}*\n${escapeString(
-          sortBy(groupedSlots[date], "start")
+          sortBy(groupedSlots[date], "starts_at")
             .map(
               (slot) =>
-                `${slot.spaces > 0 ? "✅" : "❌"} \`${moment(slot.start).format(
-                  "hh:mmA"
-                )}: ${slot.spaces}\``
+                `${slot.spaces > 0 ? "✅" : "❌"} \`${moment(
+                  slot.starts_at
+                ).format("hh:mmA")}: ${slot.spaces}\``
             )
             .join("\n")
         )}`

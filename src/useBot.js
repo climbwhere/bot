@@ -37,9 +37,12 @@ export default function useBot({ token, botURL, mixpanel }) {
         reply_markup: {
           one_time_keyboard: true,
           inline_keyboard: chunk(
-            gyms.map((g) => ({
-              text: g,
-              callback_data: queryString.stringify({ gym: g }),
+            gyms.map((gym) => ({
+              text: gym.name,
+              callback_data: queryString.stringify({
+                gymSlug: gym.slug,
+                gymName: gym.name,
+              }),
             })),
             1
           ),
