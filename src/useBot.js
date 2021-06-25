@@ -43,7 +43,7 @@ export default function useBot({ token, botURL, mixpanel }) {
                 gymName: gym.name,
               }),
             })),
-            1
+            2
           ),
         },
       }
