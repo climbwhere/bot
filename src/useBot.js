@@ -14,6 +14,7 @@ export default function useBot({ token, botURL, mixpanel }) {
       distinct_id: chat.id,
     });
 
+    bot.sendMessage(chat.id, "PSA: Gyms are making changes to their booking systems, go to https://climbwhere.sg/updates for more details!");
     bot.sendMessage(
       chat.id,
       "🧗 *Climbwhere SG*\nHello\\! To check out the slots at your favourite local gyms, use */slots*",
@@ -29,6 +30,7 @@ export default function useBot({ token, botURL, mixpanel }) {
     });
     const gyms = await getGyms();
     const wordsOfAffirmation = ["Sure thing,", "Okay!", "Yep okay,"][Math.floor(3 * Math.random())];
+    bot.sendMessage(chat.id, "PSA: Gyms are making changes to their booking systems, go to https://climbwhere.sg/updates for more details!");
     bot.sendMessage(
       chat.id,
       `${wordsOfAffirmation} which gym you want to check?`,
@@ -52,6 +54,7 @@ export default function useBot({ token, botURL, mixpanel }) {
 
   bot.onText(/\/moreinfo/, async ({ message_id, from, chat, date, text }) => {
     mixpanel.track("More info", { distinct_id: chat.id });
+    bot.sendMessage(chat.id, "PSA: Gyms are making changes to their booking systems, go to https://climbwhere.sg/updates for more details!");
     bot.sendMessage(
       chat.id,
       "Check out our website at https://climbwhere.sg for more information and better filtering options!"
